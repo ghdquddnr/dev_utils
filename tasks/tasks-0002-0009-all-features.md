@@ -1,6 +1,6 @@
-# Task List: 모든 기능 구현 (0002-0009 PRD)
+# Task List: 모든 기능 구현 (0002-0010 PRD)
 
-기반 PRD: `0002-prd-java-json-converter.md` ~ `0009-prd-regex-tester.md`
+기반 PRD: `0002-prd-java-json-converter.md` ~ `0010-prd-jasypt-encryptor-decryptor.md`
 
 ---
 
@@ -57,8 +57,19 @@
 - `lib/data/regex-patterns.json` - RegEx 패턴 라이브러리
 - `lib/data/redis-patterns.json` - Redis 키 패턴 라이브러리
 
+### Jasypt 암호화/복호화 도구 (Hybrid Architecture)
+- `resources/jasypt/GenericJasypt.jar` - Java CLI 도구 (Jasypt + BouncyCastle)
+- `resources/jasypt/pom.xml` - Maven 프로젝트 설정 파일
+- `resources/jasypt/src/main/java/GenericJasypt.java` - Java 소스 코드
+- `app/api/jasypt/route.ts` - Next.js API Route (child_process 사용)
+- `app/api/jasypt/route.test.ts` - API Route 테스트 (선택)
+- `lib/types.ts` - Jasypt 타입 추가 (JasyptEncryptionData, JasyptEncryptionResult)
+- `components/tools/JasyptConverter.tsx` - UI 컴포넌트
+- `components/tools/JasyptConverter.test.tsx` - 컴포넌트 테스트
+
 ### 문서
 - `README.md` - 새로운 도구 사용법 추가
+- `resources/jasypt/README.md` - Java CLI 도구 빌드 및 사용법
 
 ### Notes
 
@@ -478,38 +489,311 @@
 
 ---
 
-### 6.0 최종 통합, 테스트 및 배포 준비
+### 6.0 Jasypt 암호화/복호화 도구 구현 (Hybrid Architecture)
 
-- [ ] 6.1 모든 도구 통합 테스트
-  - ToolsLayout에서 모든 9개 탭 전환 가능성 확인
+#### 6.1 Java CLI 도구 개발 (GenericJasypt.jar)
+
+- [ ] 6.1.1 Maven 프로젝트 초기화
+  - `resources/jasypt/` 디렉토리 생성
+  - `pom.xml` 생성 및 의존성 추가:
+    - `org.jasypt:jasypt:1.9.3`
+    - `org.bouncycastle:bcprov-jdk15on:1.70`
+  - 기본 프로젝트 구조 설정 (`src/main/java/`)
+
+- [ ] 6.1.2 `GenericJasypt.java` 메인 클래스 구현
+  - `main(String[] args)` 메서드 작성
+  - 커맨드라인 인자 파싱:
+    - `args[0]`: mode (encrypt | decrypt)
+    - `args[1]`: text (입력 텍스트)
+    - `args[2]`: password (Secret Key)
+    - `args[3]`: algorithm (알고리즘)
+    - `args[4]`: outputType (hexadecimal | base64)
+    - `args[5]`: poolSize (1-10)
+  - 인자 개수 검증 (최소 6개)
+
+- [ ] 6.1.3 암호화/복호화 로직 구현
+  - `PooledPBEStringEncryptor` 인스턴스 생성
+  - Bouncy Castle Provider 설정
+  - 알고리즘, 패스워드, 출력 타입, Pool Size 설정
+  - `encrypt()` / `decrypt()` 메서드 호출
+  - 결과를 stdout으로 출력, 에러를 stderr로 출력
+
+- [ ] 6.1.4 에러 처리 구현
+  - try-catch로 모든 예외 포착
+  - 친절한 에러 메시지 출력:
+    - "Error: Missing arguments"
+    - "Error: Decryption failed - Invalid key or algorithm"
+    - "Error: Invalid input format"
+  - 비정상 종료 시 exit code 1 반환
+
+- [ ] 6.1.5 Jar 파일 빌드 및 테스트
+  - `mvn clean package` 실행
+  - `target/GenericJasypt.jar` 생성 확인
+  - 로컬 테스트:
+    ```bash
+    java -jar GenericJasypt.jar encrypt "myPassword" "mySecretKey" "PBEWithSHA256And128BitAES-CBC-BC" "hexadecimal" "1"
+    ```
+  - 암호화/복호화 정확성 검증
+
+- [ ] 6.1.6 빌드된 Jar 파일 배치
+  - `resources/jasypt/GenericJasypt.jar`로 복사
+  - Next.js 프로젝트에서 접근 가능한 위치 확인
+  - `.gitignore` 확인 (Jar 파일 제외 여부)
+
+- [ ] 6.1.7 Java CLI 문서 작성
+  - `resources/jasypt/README.md` 생성
+  - 빌드 방법, 사용법, 예제 작성
+
+#### 6.2 Next.js API Route 구현 (/api/jasypt)
+
+- [ ] 6.2.1 `app/api/jasypt/route.ts` 파일 생성
+  - TypeScript 기본 구조 작성
+  - `export async function POST(request: Request)` 함수 정의
+
+- [ ] 6.2.2 요청 본문 파싱
+  - `await request.json()` 호출
+  - 필드 추출: `mode, text, password, algorithm, outputType, poolSize`
+  - 필수 필드 검증 (빈 값 체크)
+
+- [ ] 6.2.3 `ENC()` 자동 제거 로직 구현
+  - 정규식으로 `ENC(...)`에서 내용만 추출
+  - `const cleanText = text.replace(/^ENC\((.*)\)$/, '$1')`
+  - 양쪽 공백 제거 (`trim()`)
+
+- [ ] 6.2.4 Java CLI 실행 로직 구현
+  - `child_process`의 `exec` 함수 import
+  - `util.promisify(exec)` 사용
+  - Jar 파일 경로 계산: `path.join(process.cwd(), 'resources', 'jasypt', 'GenericJasypt.jar')`
+  - 명령어 문자열 조립:
+    ```typescript
+    `java -jar "${jarPath}" ${mode} "${cleanText}" "${password}" "${algorithm}" "${outputType}" "${poolSize}"`
+    ```
+  - 큰따옴표 이스케이핑 처리
+
+- [ ] 6.2.5 에러 처리 및 응답 포맷팅
+  - `try-catch` 블록으로 감싸기
+  - stderr 내용 확인하여 에러 분류:
+    - "Invalid key" → "Secret Key가 일치하지 않습니다"
+    - "Invalid algorithm" → "알고리즘이 일치하지 않습니다"
+    - 기타 → "입력 형식이 올바르지 않습니다"
+  - 성공 시: `NextResponse.json({ result: stdout.trim() })`
+  - 실패 시: `NextResponse.json({ error: "에러 메시지" }, { status: 500 })`
+
+- [ ] 6.2.6 보안 검증
+  - 입력 문자열 sanitization (명령어 인젝션 방지)
+  - Secret Key가 로그에 노출되지 않도록 확인
+  - timeout 설정 (최대 10초)
+
+- [ ] 6.2.7 API Route 테스트 (선택)
+  - `app/api/jasypt/route.test.ts` 생성
+  - Mock exec 함수로 단위 테스트
+  - 성공/실패 케이스 테스트
+
+#### 6.3 타입 정의 및 클라이언트 로직
+
+- [ ] 6.3.1 `lib/types.ts` 확장
+  - Jasypt 관련 타입 추가:
+    ```typescript
+    export interface JasyptEncryptionData {
+      result: string;          // 암호화 또는 복호화된 텍스트
+      mode: 'encrypt' | 'decrypt';
+      original: string;        // 원본 입력
+      algorithm: string;
+      outputType: string;
+    }
+
+    export type JasyptEncryptionResult = Result<JasyptEncryptionData>;
+
+    export interface JasyptApiRequest {
+      mode: 'encrypt' | 'decrypt';
+      text: string;
+      password: string;
+      algorithm: string;
+      outputType: string;
+      poolSize: string;
+    }
+
+    export interface JasyptApiResponse {
+      result?: string;
+      error?: string;
+    }
+    ```
+
+- [ ] 6.3.2 클라이언트 유틸리티 함수 (선택)
+  - `lib/jasypt-handler.ts` 생성 (필요시)
+  - `removeEncWrapper(text: string)` - ENC() 제거
+  - `addEncWrapper(text: string)` - ENC() 추가
+  - `validateAlgorithm(algo: string)` - 알고리즘 검증
+
+#### 6.4 React 컴포넌트 UI 구현
+
+- [ ] 6.4.1 `components/tools/JasyptConverter.tsx` 파일 생성
+  - "use client" 디렉티브 추가
+  - 기본 import (React, useState, useEffect, Shadcn 컴포넌트)
+
+- [ ] 6.4.2 상태 관리 설정
+  - `useState`로 다음 상태 관리:
+    - `key: string` (Secret Key)
+    - `text: string` (입력 텍스트)
+    - `result: string | null` (결과)
+    - `error: string | null` (에러 메시지)
+    - `algorithm: string` (기본: "PBEWithSHA256And128BitAES-CBC-BC")
+    - `outputType: string` (기본: "hexadecimal")
+    - `poolSize: string` (기본: "1")
+    - `isOpen: boolean` (고급 설정 열림/닫힘)
+    - `isLoading: boolean` (처리 중 상태)
+
+- [ ] 6.4.3 LocalStorage 설정 저장/복원
+  - `useEffect(() => { ... }, [])` 훅으로 페이지 로드 시 복원:
+    - `localStorage.getItem("jasypt_algo")`
+    - `localStorage.getItem("jasypt_key")` (선택)
+    - `localStorage.getItem("jasypt_outputType")`
+    - `localStorage.getItem("jasypt_poolSize")`
+  - 처리 전 설정 저장:
+    - `localStorage.setItem("jasypt_algo", algorithm)`
+
+- [ ] 6.4.4 암호화/복호화 함수 구현
+  - `handleProcess = async (mode: "encrypt" | "decrypt") => { ... }`
+  - 입력 검증 (key, text 빈 값 체크)
+  - `fetch("/api/jasypt", { method: "POST", body: JSON.stringify(...) })`
+  - 응답 처리:
+    - 성공: `setResult(data.result)`, `setError(null)`, `toast.success("처리 완료!")`
+    - 실패: `setError(data.error)`, `setResult(null)`, `toast.error(...)`
+  - 로딩 상태 관리 (`setIsLoading(true/false)`)
+
+- [ ] 6.4.5 복사 버튼 구현
+  - `navigator.clipboard.writeText(result)`
+  - `toast.info("클립보드에 복사되었습니다")`
+
+- [ ] 6.4.6 UI 레이아웃 구현
+  - Card 컨테이너 (`max-w-xl mx-auto`)
+  - CardHeader: "Jasypt Encryptor/Decryptor"
+  - CardContent:
+    - **Secret Key (Password)** Input (type="password")
+    - **Target Text** Input (placeholder="ENC(...) or plain text")
+    - **고급 설정** Collapsible:
+      - Algorithm Select (3개 옵션)
+      - Output Type Select (2개 옵션)
+      - Pool Size Input (type="number", 1-10)
+    - 버튼 그룹:
+      - [Decrypt] Button (variant="default")
+      - [Encrypt] Button (variant="secondary")
+    - 결과 영역 (result가 있을 때만 표시):
+      - Label: "Result (Click to copy)"
+      - Code 블록 (클릭 시 복사)
+      - [복사] Button
+    - 에러 영역 (error가 있을 때만 표시):
+      - Alert (variant="destructive")
+
+- [ ] 6.4.7 로딩 상태 UI
+  - 버튼에 `disabled={isLoading}` 추가
+  - 로딩 중 Spinner 또는 텍스트 표시
+
+- [ ] 6.4.8 스타일링 및 반응형
+  - Shadcn UI 기본 스타일 적용
+  - 모바일 반응형 확인 (입력 필드 너비 조정)
+  - 다크 모드 호환성 확인
+
+- [ ] 6.4.9 컴포넌트 테스트 작성 (선택)
+  - `components/tools/JasyptConverter.test.tsx` 생성
+  - React Testing Library 사용
+  - 렌더링, 입력, 변환, 복사 테스트
+
+#### 6.5 통합 및 최종 테스트
+
+- [ ] 6.5.1 `components/ToolsLayout.tsx` 업데이트
+  - `import { JasyptConverter } from "@/components/tools/JasyptConverter"`
+  - `renderToolContent()` switch문에 케이스 추가:
+    ```typescript
+    case "jasypt":
+      return <JasyptConverter />
+    ```
+  - `getToolTitle()`, `getToolDescription()` 함수 업데이트
+
+- [ ] 6.5.2 `components/Sidebar.tsx` 업데이트
+  - 메뉴 항목 추가 (보안 섹션):
+    ```typescript
+    { id: "jasypt", label: "Jasypt", icon: Lock, section: "보안" }
+    ```
+  - Lucide `Lock` 아이콘 import
+
+- [ ] 6.5.3 타입 체크 및 빌드 테스트
+  - `npx tsc --noEmit` 실행 (타입 에러 확인)
+  - `npm run build` 실행 (빌드 성공 확인)
+  - 경고 메시지 해결
+
+- [ ] 6.5.4 브라우저 엔드-투-엔드 테스트
+  - 개발 서버 실행: `npm run dev`
+  - Jasypt 탭 이동 확인
+  - **암호화 테스트**:
+    - Secret Key 입력: "testKey"
+    - 텍스트 입력: "myPassword123"
+    - [Encrypt] 클릭 → 암호화된 문자열 출력 확인
+  - **복호화 테스트**:
+    - 위에서 생성된 암호화 문자열 입력
+    - [Decrypt] 클릭 → "myPassword123" 복원 확인
+  - **ENC() 자동 제거 테스트**:
+    - 입력: `ENC(암호화된문자열)`
+    - 자동으로 ENC() 제거되어 복호화 성공
+  - **고급 설정 테스트**:
+    - Algorithm 변경 → 복호화 실패 확인
+    - Output Type 변경 (hex ↔ base64) 테스트
+  - **LocalStorage 테스트**:
+    - 설정 입력 → 페이지 새로고침 → 설정 복원 확인
+  - **에러 처리 테스트**:
+    - 잘못된 Secret Key → 에러 메시지 확인
+    - 빈 입력 → 검증 에러 확인
+
+- [ ] 6.5.5 성능 및 보안 검증
+  - 암호화/복호화 처리 시간 측정 (목표: <5초)
+  - 네트워크 탭에서 API 요청/응답 확인
+  - Secret Key가 로그에 노출되지 않는지 확인
+  - 브라우저 콘솔 에러 확인
+
+- [ ] 6.5.6 문서 업데이트
+  - `README.md` 업데이트:
+    - Jasypt 도구 설명 추가
+    - 사전 요구사항: Java 11+ 설치 필요
+    - 사용 예제 추가
+  - `resources/jasypt/README.md` 작성:
+    - Java CLI 빌드 방법
+    - 독립 실행 방법
+    - Troubleshooting
+
+---
+
+### 7.0 최종 통합, 테스트 및 배포 준비
+
+- [ ] 7.1 모든 도구 통합 테스트
+  - ToolsLayout에서 모든 10개 탭 전환 가능성 확인 (Jasypt 포함)
   - 각 도구별 기본 기능 작동 확인
   - 예제 데이터로 엔드-투-엔드 테스트
 
-- [ ] 6.2 UI/UX 최적화
+- [ ] 7.2 UI/UX 최적화
   - 반응형 디자인 검증 (모바일, 태블릿, 데스크톱)
   - 다크 모드 적용 확인
   - 접근성 검증 (키보드 네비게이션, 색상 대비)
   - 로딩 상태 및 에러 메시지 UI 일관성
 
-- [ ] 6.3 성능 최적화
+- [ ] 7.3 성능 최적화
   - 각 도구별 응답 속도 측정 (목표: <100ms)
   - 번들 크기 검증
   - 메모리 누수 확인
 
-- [ ] 6.4 문서 업데이트
+- [ ] 7.4 문서 업데이트
   - `README.md` 업데이트
     - 모든 도구 설명 및 사용법 추가
     - 설치, 실행, 테스트 명령어
     - 기술 스택 업데이트
   - 각 도구별 예제 및 팁 추가
 
-- [ ] 6.5 최종 빌드 및 타입 검사
+- [ ] 7.5 최종 빌드 및 타입 검사
   - `npm run build` 실행 및 빌드 성공 확인
   - `npx tsc --noEmit` 타입 체크 성공 확인
   - 모든 테스트 통과 확인 (`npm test`)
   - Lint 확인 (`npm run lint`)
 
-- [ ] 6.6 배포 준비
+- [ ] 7.6 배포 준비
   - 환경 변수 확인
   - Vercel/Docker/Node.js 배포 옵션 검토
   - CI/CD 파이프라인 구성 (선택사항)
@@ -519,13 +803,21 @@
 
 ## 📊 요약
 
-**총 Task**: 6개 Parent Task + 51개 Sub-tasks
-**예상 구현 파일**: 40개+ (handlers, components, tests, data)
-**예상 테스트**: 450+ 단위 테스트
+**총 Task**: 7개 Parent Task + 90개+ Sub-tasks
+**예상 구현 파일**: 50개+ (handlers, components, tests, data, Java CLI)
+**예상 테스트**: 500+ 단위 테스트
 
-**실행 순서**: 1.0 → 2.0 → 3.0 → 4.0 → 5.0 → 6.0 (순차)
-**병렬 처리**: 2.0, 3.0, 4.0, 5.0의 일부 Sub-tasks는 병렬 가능
+**실행 순서**: 1.0 → 2.0 → 3.0 → 4.0 → 5.0 → 6.0 → 7.0
+- **Task 6.0 (Jasypt)**은 4.0, 5.0과 병렬 처리 가능 (독립적 구조)
+- **Task 7.0 (최종 통합)**은 모든 작업 완료 후 실행
 
-**문서 버전**: 1.0
-**작성일**: 2025-11-21
-**상태**: 준비 완료
+**병렬 처리 가능**: 2.0, 3.0, 4.0, 5.0, 6.0의 일부 Sub-tasks는 병렬 가능
+
+**특별 요구사항** (Task 6.0 - Jasypt):
+- Java 11+ 설치 필요
+- Maven 빌드 환경 필요
+- Jasypt + Bouncy Castle 라이브러리
+
+**문서 버전**: 2.0
+**최종 업데이트**: 2025-11-21
+**상태**: 준비 완료 (Jasypt 도구 추가)
