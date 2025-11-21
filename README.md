@@ -1,5 +1,7 @@
 # Dev Utils - 개발자 도구 모음
 
+[![GitHub](https://img.shields.io/badge/GitHub-ghdquddnr%2Fdev__utils-blue?logo=github)](https://github.com/ghdquddnr/dev_utils)
+
 클라이언트 사이드에서 안전하게 동작하는 개발자 유틸리티 도구 모음입니다. 모든 데이터는 브라우저 내에서만 처리되며 서버로 전송되지 않습니다.
 
 ## 🎯 주요 기능
@@ -73,6 +75,56 @@ SQL: `SELECT * FROM users WHERE id = ? AND name = ? AND status = ?`
 
 ---
 
+### 4. Java ↔ JSON 변환기
+Java 객체 정의를 JSON으로, JSON을 Java 클래스로 변환합니다.
+
+**기능:**
+- ☕ Java 클래스 → JSON 샘플 데이터
+- 📦 JSON → Java POJO 클래스 생성
+- 🔄 양방향 변환 지원
+- 📋 클립보드 복사
+- 💡 예제 제공
+
+---
+
+### 5. YAML ↔ Properties 변환기
+YAML 파일과 Properties 파일 간 상호 변환을 제공합니다.
+
+**기능:**
+- 📄 YAML → Properties 변환
+- 📋 Properties → YAML 변환
+- 🔄 중첩 구조 지원
+- 📐 들여쓰기 선택 (2칸/4칸)
+- 💡 예제 제공
+
+---
+
+### 6. Timestamp 변환기
+Unix Timestamp와 날짜 간의 상호 변환을 제공합니다.
+
+**기능:**
+- ⏰ Timestamp → 날짜 변환
+- 📅 날짜 → Timestamp 변환
+- 🌍 다중 타임존 지원 (KST, UTC, JST, EST, CST, PST)
+- 🕐 현재 시간 표시
+- ⚡ 초/밀리초 단위 선택
+- 📋 결과 복사
+
+---
+
+### 7. Cron Expression 생성기/테스터
+Cron 표현식을 생성하고 다음 실행 시간을 계산합니다.
+
+**기능:**
+- ⚙️ GUI 빌더로 Cron 표현식 생성
+- ✅ Cron 표현식 검증 및 파싱
+- 📅 다음 10번 실행 시간 계산
+- 🎯 프리셋 패턴 제공
+- 🔄 Linux/Quartz 형식 지원
+- 📋 표현식 복사
+
+---
+
 ## 🔒 보안
 
 ✅ 모든 데이터는 클라이언트(브라우저) 내에서만 처리
@@ -86,7 +138,8 @@ SQL: `SELECT * FROM users WHERE id = ? AND name = ? AND status = ?`
 - **Styling**: Tailwind CSS 4
 - **Component Library**: Shadcn UI
 - **Icons**: Lucide React
-- **Testing**: Jest 30.2.0
+- **Testing**: Jest 30.2.0, React Testing Library
+- **Libraries**: date-fns, js-yaml, cron-parser
 
 ## 📦 설치 & 실행
 
@@ -120,31 +173,56 @@ npx tsc --noEmit
 
 ## 📊 테스트 현황
 
-✅ **총 135개 단위 테스트 통과**
+✅ **총 288개 테스트 통과 (단위 테스트 230개 + 컴포넌트 테스트 58개)**
 
+**Handler 단위 테스트:**
 - JSON 핸들러: 37개 테스트 ✓
 - JWT 핸들러: 46개 테스트 ✓
 - SQL 핸들러: 52개 테스트 ✓
+- Java↔JSON 핸들러: 35개 테스트 ✓
+- YAML↔Properties 핸들러: 32개 테스트 ✓
+- Timestamp 핸들러: 13개 테스트 ✓
+- Cron 핸들러: 15개 테스트 ✓
+
+**컴포넌트 테스트:**
+- JavaJsonConverter: 29개 테스트 ✓
+- TimestampConverter: 29개 테스트 ✓
+- CronExpressionGenerator: 29개 테스트 ✓
+
+**진행 중:**
+- Task 3.0 (시간 & 데이터 처리): 100% 완료 ✅
+- Task 4.0 (보안 & 유틸리티): 대기 중
+- Task 5.0 (사내 특화 도구): 대기 중
 
 ## 📂 프로젝트 구조
 
 ```
 dev_utils/
 ├── app/                     # Next.js 앱 라우터
+│   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
 ├── components/
 │   ├── tools/              # 도구 컴포넌트
 │   │   ├── JsonFormatter.tsx
 │   │   ├── JwtDecoder.tsx
-│   │   └── SqlBinder.tsx
-│   └── ui/                 # Shadcn UI 컴포넌트
+│   │   ├── SqlBinder.tsx
+│   │   ├── JavaJsonConverter.tsx
+│   │   ├── YamlPropertiesConverter.tsx
+│   │   ├── TimestampConverter.tsx
+│   │   ├── CronExpressionGenerator.tsx
+│   │   └── *.test.tsx      # 컴포넌트 테스트
+│   ├── ui/                 # Shadcn UI 컴포넌트
+│   ├── Sidebar.tsx         # 메뉴 네비게이션
+│   └── ToolsLayout.tsx     # 도구 라우팅
 ├── lib/
-│   ├── json-handler.ts     # JSON 처리 로직
-│   ├── jwt-handler.ts      # JWT 처리 로직
-│   ├── sql-handler.ts      # SQL 처리 로직
+│   ├── *-handler.ts        # Handler 로직
+│   ├── *-handler.test.ts   # Handler 테스트
 │   ├── types.ts            # 타입 정의
 │   └── utils.ts            # 유틸리티 함수
+├── tasks/                   # 프로젝트 작업 문서
+│   └── tasks-0002-0009-all-features.md
+├── CLAUDE.md               # Claude Code 가이드
 ├── jest.config.js
 └── package.json
 ```
@@ -163,6 +241,14 @@ dev_utils/
 - 파라미터는 반드시 JSON 배열 형식이어야 합니다
 - `?` 개수와 파라미터 개수가 일치해야 합니다
 - 작은따옴표(`'`)는 자동으로 `''`로 이스케이프됩니다
+
+### Timestamp 도구
+- Unix Timestamp는 1970-01-01 00:00:00 UTC부터의 시간입니다
+- 초 단위는 10자리, 밀리초 단위는 13자리 숫자입니다
+
+### Cron 도구
+- Linux 형식: 5필드 (분 시 일 월 요일)
+- Quartz/Spring 형식: 6필드 (초 분 시 일 월 요일)
 
 ## 📞 지원
 
