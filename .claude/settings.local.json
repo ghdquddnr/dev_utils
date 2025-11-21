@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nul)",
+      "Bash(npx shadcn-ui@latest add:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__fill",
+      "mcp__chrome-devtools__click",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(npm i:*)",
+      "Bash(npm test:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cd:*)",
+      "Bash(tree:*)",
+      "Bash(taskkill:*)",
+      "Bash(timeout /t 2)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -ExpandProperty OwningProcess)",
+      "Bash(ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue })",
+      "Bash(Write-Host \"Port 3000 cleared\")",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(kill:*)",
+      "Bash(fuser:*)",
+      "Bash(node -e:*)",
+      "Bash(node lib/test-cron.js:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

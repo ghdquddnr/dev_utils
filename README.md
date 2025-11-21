@@ -1,36 +1,176 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dev Utils - 개발자 도구 모음
 
-## Getting Started
+클라이언트 사이드에서 안전하게 동작하는 개발자 유틸리티 도구 모음입니다. 모든 데이터는 브라우저 내에서만 처리되며 서버로 전송되지 않습니다.
 
-First, run the development server:
+## 🎯 주요 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 1. JSON 포매터 & 검증 도구
+JSON 문자열을 검증하고 포맷팅하거나 축소합니다.
+
+**기능:**
+- ✨ 실시간 JSON 유효성 검증
+- 📐 2칸 들여쓰기로 포맷팅
+- ⚡ 공백 제거하여 축소
+- 📋 클립보드 복사
+- 🔄 한번에 초기화
+
+**사용 예:**
+
+입력: `{"name":"John","age":30,"city":"Seoul","hobbies":["reading","gaming"]}`
+
+포맷팅 결과:
+```json
+{
+  "name": "John",
+  "age": 30,
+  "city": "Seoul",
+  "hobbies": [
+    "reading",
+    "gaming"
+  ]
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. JWT 디코더 (오프라인)
+JWT 토큰을 디코딩하여 Header, Payload, Signature를 표시합니다.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**기능:**
+- 🔍 JWT 형식 검증
+- 📖 Header, Payload, Signature 분리 디코딩
+- ⏰ 발급/만료 시간 자동 포맷팅
+- ⚠️ 토큰 만료 여부 표시
+- 📋 각 섹션 별도 복사
+- 🔐 서명 검증 불가 안내 (오프라인 모드)
 
-## Learn More
+**지원하는 표준 클레임:**
+- `iss` (Issuer) - 발급자
+- `sub` (Subject) - 주체
+- `aud` (Audience) - 대상자
+- `exp` (Expiration Time) - 만료 시간
+- `iat` (Issued At) - 발급 시간
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 3. SQL 파라미터 바인더
+SQL 쿼리의 `?` 플레이스홀더에 파라미터를 바인딩합니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**기능:**
+- 🔍 파라미터 개수 검증
+- 🔄 자동 쿼리 변환
+- 🛡️ 특수문자 자동 이스케이핑
+- 📚 SQL 예제 제공
+- 📋 결과 복사
 
-## Deploy on Vercel
+**사용 예:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+SQL: `SELECT * FROM users WHERE id = ? AND name = ? AND status = ?`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+파라미터: `[123, "John O'Brien", "active"]`
+
+결과: `SELECT * FROM users WHERE id = 123 AND name = 'John O''Brien' AND status = 'active'`
+
+---
+
+## 🔒 보안
+
+✅ 모든 데이터는 클라이언트(브라우저) 내에서만 처리
+✅ 서버로 데이터 전송 안함
+✅ 민감한 정보 안전하게 처리 가능
+
+## 🛠️ 기술 스택
+
+- **Framework**: Next.js 16.0.3
+- **UI Framework**: React 19.2.0
+- **Styling**: Tailwind CSS 4
+- **Component Library**: Shadcn UI
+- **Icons**: Lucide React
+- **Testing**: Jest 30.2.0
+
+## 📦 설치 & 실행
+
+### 설치
+```bash
+npm install
+```
+
+### 개발 서버 실행
+```bash
+npm run dev
+```
+
+### 프로덕션 빌드
+```bash
+npm run build
+npm start
+```
+
+### 테스트 실행
+```bash
+npm test                                    # 모든 테스트
+npm test:watch                              # 감시 모드
+npm test -- lib/json-handler.test.ts        # 특정 모듈 테스트
+```
+
+### 타입 체크
+```bash
+npx tsc --noEmit
+```
+
+## 📊 테스트 현황
+
+✅ **총 135개 단위 테스트 통과**
+
+- JSON 핸들러: 37개 테스트 ✓
+- JWT 핸들러: 46개 테스트 ✓
+- SQL 핸들러: 52개 테스트 ✓
+
+## 📂 프로젝트 구조
+
+```
+dev_utils/
+├── app/                     # Next.js 앱 라우터
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── tools/              # 도구 컴포넌트
+│   │   ├── JsonFormatter.tsx
+│   │   ├── JwtDecoder.tsx
+│   │   └── SqlBinder.tsx
+│   └── ui/                 # Shadcn UI 컴포넌트
+├── lib/
+│   ├── json-handler.ts     # JSON 처리 로직
+│   ├── jwt-handler.ts      # JWT 처리 로직
+│   ├── sql-handler.ts      # SQL 처리 로직
+│   ├── types.ts            # 타입 정의
+│   └── utils.ts            # 유틸리티 함수
+├── jest.config.js
+└── package.json
+```
+
+## 💡 팁 & 주의사항
+
+### JSON 도구
+- 입력 시 실시간으로 검증됩니다
+- SyntaxError 발생 시 에러 위치(라인, 컬럼)를 표시합니다
+
+### JWT 도구
+- 서명 검증은 지원되지 않습니다 (오프라인 모드)
+- 만료된 토큰도 디코딩 가능합니다
+
+### SQL 도구
+- 파라미터는 반드시 JSON 배열 형식이어야 합니다
+- `?` 개수와 파라미터 개수가 일치해야 합니다
+- 작은따옴표(`'`)는 자동으로 `''`로 이스케이프됩니다
+
+## 📞 지원
+
+문제가 발생하면:
+1. 콘솔 에러 메시지를 확인하세요
+2. 입력 형식이 올바른지 확인하세요
+3. 브라우저 개발자 도구(F12)를 열어 에러를 확인하세요
+
+## 📝 라이선스
+
+MIT License
