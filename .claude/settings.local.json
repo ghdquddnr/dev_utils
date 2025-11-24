@@ -35,7 +35,19 @@
       "Bash(fuser:*)",
       "Bash(node -e:*)",
       "Bash(node lib/test-cron.js:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "mcp__chrome-devtools__list_pages",
+      "SlashCommand(/sc:save)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout /t 5)",
+      "Bash(mvn --version:*)",
+      "Bash(choco --version:*)",
+      "Bash(mvn clean package:*)",
+      "Bash(java -jar target/GenericJasypt.jar encrypt:*)",
+      "Bash(java -jar target/GenericJasypt.jar decrypt:*)"
     ],
     "deny": [],
     "ask": []

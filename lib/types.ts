@@ -281,43 +281,6 @@ export interface RedisCommandData {
 export type RedisCommandResult = Result<RedisCommandData>;
 
 // ============================================
-// Error Code Lookup 관련 타입
-// ============================================
-
-/**
- * 에러 코드 정의
- */
-export interface ErrorCode {
-  id: string;
-  category: string;
-  severity: 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
-  httpStatus?: number;
-  message: string;
-  description: string;
-  causes: string[];
-  solutions: string[];
-  examples?: {
-    language: string;
-    code: string;
-  }[];
-  relatedCodes?: string[];
-}
-
-/**
- * 에러 코드 조회 결과 데이터
- */
-export interface ErrorCodeLookupData {
-  errorCode: ErrorCode;
-  searchQuery?: string;
-  totalMatches?: number;
-}
-
-/**
- * 에러 코드 조회 결과 (성공 또는 에러)
- */
-export type ErrorCodeLookupResult = Result<ErrorCodeLookupData>;
-
-// ============================================
 // RegEx Tester 관련 타입
 // ============================================
 
@@ -328,12 +291,17 @@ export interface RegexPattern {
   id: string;
   name: string;
   pattern: string;
-  flags?: string;
+  flags: string; // "g", "gi", "gm" 등
   description: string;
-  category: string;
+  category: 'validation' | 'format' | 'extraction' | 'code'; // 패턴 카테고리
+  complexity: 'basic' | 'intermediate' | 'advanced'; // 복잡도
   examples: {
     valid: string[];
     invalid: string[];
+  };
+  usage: {
+    javascript: string; // JavaScript 사용 예제 코드
+    java?: string; // Java 사용 예제 코드 (선택)
   };
 }
 
@@ -341,15 +309,56 @@ export interface RegexPattern {
  * RegEx 테스트 결과 데이터
  */
 export interface RegexTestData {
-  pattern: string;
-  testString: string;
-  matches: boolean;
-  matchResults?: string[];
-  captureGroups?: any[];
-  highlightedText?: string;
+  pattern: string; // 테스트한 정규식 패턴
+  flags: string; // 사용한 플래그
+  testString: string; // 테스트 문자열
+  isMatch: boolean; // 매칭 여부
+  matches: string[]; // 매칭된 문자열 배열
+  matchCount: number; // 매칭 개수
 }
 
 /**
  * RegEx 테스트 결과 (성공 또는 에러)
  */
 export type RegexTestResult = Result<RegexTestData>;
+
+// ============================================
+// Jasypt Encryptor/Decryptor 관련 타입
+// ============================================
+
+/**
+ * Jasypt 암호화/복호화 결과 데이터
+ */
+export interface JasyptEncryptionData {
+  result: string; // 암호화 또는 복호화된 텍스트
+  mode: 'encrypt' | 'decrypt'; // 수행한 작업 모드
+  original: string; // 원본 입력 텍스트
+  algorithm: string; // 사용한 알고리즘
+  outputType: string; // 출력 타입 (hexadecimal | base64)
+}
+
+/**
+ * Jasypt 암호화/복호화 결과 (성공 또는 에러)
+ */
+export type JasyptEncryptionResult = Result<JasyptEncryptionData>;
+
+/**
+ * Jasypt API 요청 데이터
+ */
+export interface JasyptApiRequest {
+  mode: 'encrypt' | 'decrypt'; // 암호화 또는 복호화
+  text: string; // 입력 텍스트 (평문 또는 암호화된 텍스트)
+  password: string; // Secret Key (암호화 키)
+  algorithm: string; // 암호화 알고리즘
+  outputType: string; // 출력 형식 (hexadecimal | base64)
+  poolSize: string; // Encryptor Pool 크기 (1-10)
+}
+
+/**
+ * Jasypt API 응답 데이터
+ */
+export interface JasyptApiResponse {
+  result?: string; // 암호화/복호화 결과 (성공 시)
+  error?: string; // 에러 메시지 (실패 시)
+  details?: string; // 상세 에러 정보 (선택)
+}

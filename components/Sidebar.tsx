@@ -11,7 +11,6 @@ import {
   Zap,
   Link2,
   Cpu,
-  AlertCircle,
   FileText,
 } from "lucide-react"
 
@@ -99,17 +98,17 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           label: "Redis",
           description: "키 패턴 관리",
         },
+        {
+          id: "jasypt",
+          icon: Lock,
+          label: "Jasypt",
+          description: "암호화/복호화",
+        },
       ],
     },
     {
       title: "사내 특화",
       items: [
-        {
-          id: "error-code",
-          icon: AlertCircle,
-          label: "에러 코드",
-          description: "조회 & 검색",
-        },
         {
           id: "regex",
           icon: FileText,

@@ -9,6 +9,10 @@ import { JavaJsonConverter } from "@/components/tools/JavaJsonConverter"
 import { YamlPropertiesConverter } from "@/components/tools/YamlPropertiesConverter"
 import { TimestampConverter } from "@/components/tools/TimestampConverter"
 import { CronExpressionGenerator } from "@/components/tools/CronExpressionGenerator"
+import { UrlEncoderDecoder } from "@/components/tools/UrlEncoderDecoder"
+import { RedisKeyScanner } from "./tools/RedisKeyScanner";
+import { RegexTester } from "./tools/RegexTester";
+import { JasyptConverter } from "./tools/JasyptConverter";
 import { ToolPlaceholder } from "@/components/tools/ToolPlaceholder"
 
 interface ToolsLayoutProps {
@@ -42,13 +46,13 @@ export function ToolsLayout({ children }: ToolsLayoutProps) {
       case "cron":
         return <CronExpressionGenerator />
       case "url":
-        return <ToolPlaceholder toolName="URL Encoder/Decoder" />
+        return <UrlEncoderDecoder />;
       case "redis":
-        return <ToolPlaceholder toolName="Redis Key 패턴 스캐너" />
-      case "error-code":
-        return <ToolPlaceholder toolName="에러 코드 조회기" />
+        return <RedisKeyScanner />;
       case "regex":
-        return <ToolPlaceholder toolName="RegEx 테스트 & 라이브러리" />
+        return <RegexTester />
+      case "jasypt":
+        return <JasyptConverter />
 
       default:
         return <JsonFormatter />
@@ -66,8 +70,8 @@ export function ToolsLayout({ children }: ToolsLayoutProps) {
       "cron": "Cron Expression 생성기",
       "url": "URL Encode/Decode",
       "redis": "Redis Key 패턴 스캐너",
-      "error-code": "에러 코드 조회기",
       "regex": "정규식(RegEx) 테스트 & 라이브러리",
+      "jasypt": "Jasypt 암호화/복호화",
     }
     return titles[activeTab] || "개발자 도구"
   }
@@ -83,8 +87,8 @@ export function ToolsLayout({ children }: ToolsLayoutProps) {
       "cron": "Cron 표현식을 생성하고 테스트하세요",
       "url": "URL을 인코딩/디코딩하고 파라미터를 분석하세요",
       "redis": "Redis Key 패턴을 관리하고 명령어를 생성하세요",
-      "error-code": "에러 코드를 검색하고 해결책을 확인하세요",
       "regex": "정규식을 테스트하고 패턴을 관리하세요",
+      "jasypt": "Jasypt를 사용하여 문자열을 암호화하거나 복호화하세요",
     }
     return descriptions[activeTab] || "모든 데이터는 클라이언트에서 처리됩니다"
   }
