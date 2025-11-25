@@ -1,0 +1,48 @@
+# Dev Utils - Docker 이미지에서 제외할 파일 및 디렉토리
+
+# 의존성 디렉토리
+node_modules
+npm-debug.log*
+
+# Next.js 빌드 결과물 (빌드 시 생성됨)
+.next
+out
+
+# 테스트 관련
+coverage
+*.log
+
+# 개발 환경 파일
+.env*.local
+.env.development
+
+# Git 관련
+.git
+.gitignore
+.gitattributes
+
+# IDE 설정
+.vscode
+.idea
+*.swp
+*.swo
+*.swn
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# 문서 및 작업 파일
+README.md
+CLAUDE.md
+tasks
+claudedocs
+
+# Docker 관련
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 기타
+*.md
+!resources/**

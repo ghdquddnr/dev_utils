@@ -783,11 +783,21 @@
     - 주요 이슈: any 타입 사용, 미사용 변수
     - 빌드 및 기능에는 영향 없음
 
-- [ ] 7.6 배포 준비
-  - 환경 변수 확인
-  - Docker(docker-compose) 배포 검토(배포 설정 시 앱 외부 포트는 3030 으로)
-  - Dockerfile 및 compose 파일은 아래 경로의 폴더에 저장
-  - 배포 가능 상태 확인(개발서버: 192.168.0.12, 포트: 22, 패스워드: 1, 경로: /solomon_dev/docker/dev_utils_app)
+- [x] 7.6 배포 준비 ✅
+  - ✅ 환경 변수 확인 및 .env.example 작성
+  - ✅ Docker(docker-compose) 배포 설정 완료 (외부 포트 3030)
+  - ✅ Dockerfile 작성 (멀티 스테이지 빌드, standalone 모드)
+  - ✅ docker-compose.yml 작성 (포트 매핑, 헬스체크)
+  - ✅ .dockerignore 작성
+  - ✅ next.config.ts 업데이트 (output: 'standalone')
+  - ✅ 배포 스크립트 작성 (deploy.sh, deploy.ps1)
+  - ✅ DEPLOYMENT.md 배포 가이드 작성
+  - ✅ DEPLOYMENT_CHECKLIST.md 체크리스트 작성
+  - ✅ README.md 배포 섹션 추가
+  - ⚠️ 실제 서버 배포 테스트는 수동으로 진행 필요
+    - 서버: 192.168.0.12:22
+    - 경로: /solomon_dev/docker/dev_utils_app
+    - 방법: DEPLOYMENT.md 참고
 
 ---
 

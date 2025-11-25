@@ -573,6 +573,46 @@ dev_utils/
 - 100회 탭 전환 후 증가: 0 MB
 - **메모리 누수 없음** ✅
 
+## 🐳 배포
+
+Dev Utils는 Docker를 통해 쉽게 배포할 수 있습니다.
+
+### 배포 정보
+- **외부 포트**: 3030
+- **컨테이너 포트**: 3000
+- **배포 방식**: Docker Compose
+
+### 빠른 배포
+
+```bash
+# 1. Docker 이미지 빌드
+docker-compose build
+
+# 2. 컨테이너 실행
+docker-compose up -d
+
+# 3. 상태 확인
+docker-compose ps
+
+# 4. 로그 확인
+docker-compose logs -f
+```
+
+### 접속
+```
+http://localhost:3030
+```
+
+### 상세 배포 가이드
+
+전체 배포 가이드는 [DEPLOYMENT.md](./DEPLOYMENT.md)를 참고하세요.
+
+- 수동 배포 방법
+- 배포 스크립트 사용
+- 서버 관리 명령어
+- 문제 해결 가이드
+- 보안 권장사항
+
 ## 📞 지원
 
 문제가 발생하면:
