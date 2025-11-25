@@ -11,7 +11,7 @@ import * as cronHandler from "@/lib/cron-handler"
 // Mock the handlers
 jest.mock("@/lib/cron-handler")
 jest.mock("@/lib/utils", () => ({
-  cn: (...inputs) => {
+  cn: (...inputs: any[]) => {
     return inputs
       .flat()
       .filter((x) => typeof x === "string" && x.length > 0)

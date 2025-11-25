@@ -1,6 +1,5 @@
 "use client"
 
-import { ThemeToggle } from "@/components/ThemeToggle"
 import {
   FileJson,
   Lock,
@@ -120,17 +119,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   ]
 
   return (
-    <aside className="w-64 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-screen fixed left-0 top-0">
-      {/* 헤더 */}
-      <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Dev Utils
-        </h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-          개발자 도구 모음
-        </p>
-      </div>
-
+    <aside className="w-64 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed left-0 top-[73px] bottom-0">
       {/* 메뉴 */}
       <nav className="flex-1 px-3 py-6 overflow-y-auto space-y-6">
         {menuSections.map((section) => (
@@ -170,16 +159,6 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           </div>
         ))}
       </nav>
-
-      {/* 푸터 - 테마 토글 */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            테마
-          </span>
-          <ThemeToggle />
-        </div>
-      </div>
     </aside>
   )
 }

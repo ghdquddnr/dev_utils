@@ -47,7 +47,14 @@
       "Bash(choco --version:*)",
       "Bash(mvn clean package:*)",
       "Bash(java -jar target/GenericJasypt.jar encrypt:*)",
-      "Bash(java -jar target/GenericJasypt.jar decrypt:*)"
+      "Bash(java -jar target/GenericJasypt.jar decrypt:*)",
+      "mcp__chrome-devtools__resize_page",
+      "mcp__chrome-devtools__press_key",
+      "Bash(ping:*)",
+      "mcp__chrome-devtools__close_page",
+      "Bash(powershell -Command \"Get-ChildItem -Recurse | Measure-Object -Property Length -Sum | Select-Object @{Name=''Size(MB)'';Expression={[math]::Round($_Sum / 1MB, 2)}}, Count\")",
+      "mcp__chrome-devtools__evaluate_script",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

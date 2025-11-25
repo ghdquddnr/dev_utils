@@ -11,6 +11,12 @@ import * as javaJsonHandler from "@/lib/java-json-handler"
 // Mock the handlers
 jest.mock("@/lib/java-json-handler")
 jest.mock("@/lib/utils", () => ({
+  cn: (...inputs: any[]) => {
+    return inputs
+      .flat()
+      .filter((x) => typeof x === "string" && x.length > 0)
+      .join(" ")
+  },
   copyToClipboard: jest.fn().mockResolvedValue(true),
 }))
 

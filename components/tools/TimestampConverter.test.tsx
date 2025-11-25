@@ -11,7 +11,7 @@ import * as timestampHandler from "@/lib/timestamp-handler"
 // Mock the handlers
 jest.mock("@/lib/timestamp-handler")
 jest.mock("@/lib/utils", () => ({
-  cn: (...inputs) => {
+  cn: (...inputs: any[]) => {
     return inputs
       .flat()
       .filter((x) => typeof x === "string" && x.length > 0)

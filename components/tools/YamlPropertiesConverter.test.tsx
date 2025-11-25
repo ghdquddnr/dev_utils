@@ -16,6 +16,17 @@ jest.mock("lucide-react", () => ({
   ArrowRightLeft: () => <div data-testid="arrow-icon" />,
 }))
 
+// Mock utils
+jest.mock("@/lib/utils", () => ({
+  cn: (...inputs: any[]) => {
+    return inputs
+      .flat()
+      .filter((x) => typeof x === "string" && x.length > 0)
+      .join(" ")
+  },
+  copyToClipboard: jest.fn().mockResolvedValue(true),
+}))
+
 describe("YamlPropertiesConverter", () => {
   describe("Rendering", () => {
     test("컴포넌트가 정상적으로 렌더링됨", () => {

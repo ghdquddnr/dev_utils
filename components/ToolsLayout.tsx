@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Header } from "@/components/Header"
 import { Sidebar } from "@/components/Sidebar"
 import { JsonFormatter } from "@/components/tools/JsonFormatter"
 import { JwtDecoder } from "@/components/tools/JwtDecoder"
@@ -21,7 +22,7 @@ interface ToolsLayoutProps {
 
 /**
  * 사이드바 기반 도구 레이아웃 컴포넌트
- * 좌측 사이드바로 메뉴를 선택하고, 메인 영역에 선택된 도구를 표시합니다.
+ * 헤더 - 사이드바 - 본문 3가지 구성으로 통일된 레이아웃을 제공합니다.
  */
 export function ToolsLayout({ children }: ToolsLayoutProps) {
   const [activeTab, setActiveTab] = useState("json")
@@ -94,48 +95,56 @@ export function ToolsLayout({ children }: ToolsLayoutProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-white dark:bg-slate-950">
-      {/* 사이드바 */}
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="flex flex-col h-screen bg-white dark:bg-slate-950">
+      {/* 최상단 헤더 */}
+      <Header />
 
-      {/* 메인 콘텐츠 */}
-      <main className="ml-64 flex-1">
-        <div className="h-screen overflow-y-auto bg-gradient-to-br from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
-          {/* 헤더 */}
-          <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-8 py-6">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              {getToolTitle()}
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              {getToolDescription()}
-            </p>
-          </div>
+      {/* 사이드바 + 메인 콘텐츠 */}
+      <div className="flex flex-1 pt-[73px]">
+        {/* 사이드바 */}
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-          {/* 콘텐츠 영역 */}
-          <div className="p-8">
-            <div className="max-w-5xl">
-              {/* 보안 안내 */}
-              <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-start gap-3">
-                <div className="text-blue-600 dark:text-blue-400 text-lg mt-0.5 flex-shrink-0">
-                  🔒
-                </div>
-                <div>
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-1">
-                    보안 안내
-                  </h3>
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    모든 데이터는 클라이언트(브라우저) 내에서만 처리되며, 서버로
-                    전송되지 않습니다. 민감한 정보를 안전하게 처리할 수 있습니다.
-                  </p>
-                </div>
+        {/* 메인 콘텐츠 */}
+        <main className="ml-64 flex-1 overflow-y-auto">
+          <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-950 dark:to-slate-900 min-h-full">
+            {/* 도구 제목 및 설명 */}
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-8 py-6">
+              <div>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                  {getToolTitle()}
+                </h2>
+                <p className="text-slate-600 dark:text-slate-400">
+                  {getToolDescription()}
+                </p>
               </div>
+            </div>
 
-              {/* 도구 콘텐츠 */}
-              {renderToolContent()}
+            {/* 콘텐츠 영역 */}
+            <div className="p-8">
+              <div className="max-w-5xl">
+                {/* 보안 안내 */}
+                <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-start gap-3">
+                  <div className="text-blue-600 dark:text-blue-400 text-lg mt-0.5 flex-shrink-0">
+                    🔒
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-1">
+                      보안 안내
+                    </h3>
+                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                      모든 데이터는 클라이언트(브라우저) 내에서만 처리되며, 서버로
+                      전송되지 않습니다. 민감한 정보를 안전하게 처리할 수 있습니다.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 도구 콘텐츠 */}
+                {renderToolContent()}
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   )
 }

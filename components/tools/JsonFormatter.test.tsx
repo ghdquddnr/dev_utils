@@ -11,6 +11,12 @@ import { JsonFormatter } from './JsonFormatter'
 const mockToast = jest.fn()
 
 jest.mock('@/lib/utils', () => ({
+  cn: (...inputs: any[]) => {
+    return inputs
+      .flat()
+      .filter((x) => typeof x === "string" && x.length > 0)
+      .join(" ")
+  },
   copyToClipboard: jest.fn(async () => {
     mockToast()
     return true

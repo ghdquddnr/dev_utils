@@ -18,6 +18,16 @@ jest.mock("sonner", () => ({
   },
 }));
 
+// Mock utils
+jest.mock("@/lib/utils", () => ({
+  cn: (...inputs: any[]) => {
+    return inputs
+      .flat()
+      .filter((x) => typeof x === "string" && x.length > 0)
+      .join(" ")
+  },
+}));
+
 describe("UrlEncoderDecoder", () => {
   beforeEach(() => {
     jest.clearAllMocks();
