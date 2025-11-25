@@ -31,6 +31,9 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Java 런타임 설치 (Jasypt 실행을 위해 필요)
+RUN apk add --no-cache openjdk17-jre
+
 # Next.js 정적 파일 및 빌드 결과물 복사
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

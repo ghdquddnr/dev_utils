@@ -12,6 +12,7 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * 텍스트를 클립보드에 복사하고 toast 알림을 표시합니다
+ * HTTP 환경에서도 작동하도록 폴백 메서드를 포함합니다
  * @param text - 복사할 텍스트
  * @param message - 성공 메시지 (기본값: "복사되었습니다")
  * @returns 복사 성공 여부
@@ -20,10 +21,38 @@ export async function copyToClipboard(
   text: string,
   message: string = "복사되었습니다"
 ): Promise<boolean> {
+  // 방법 1: 최신 Clipboard API 시도 (HTTPS, localhost만 지원)
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success(message)
+      return true
+    } catch (error) {
+      console.warn("Clipboard API failed, trying fallback method:", error)
+    }
+  }
+
+  // 방법 2: 폴백 메서드 (HTTP 환경에서 작동)
   try {
-    await navigator.clipboard.writeText(text)
-    toast.success(message)
-    return true
+    const textarea = document.createElement("textarea")
+    textarea.value = text
+    textarea.style.position = "fixed"
+    textarea.style.top = "0"
+    textarea.style.left = "0"
+    textarea.style.opacity = "0"
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+
+    const successful = document.execCommand("copy")
+    document.body.removeChild(textarea)
+
+    if (successful) {
+      toast.success(message)
+      return true
+    } else {
+      throw new Error("execCommand('copy') failed")
+    }
   } catch (error) {
     toast.error("클립보드 복사에 실패했습니다")
     console.error("Copy to clipboard error:", error)

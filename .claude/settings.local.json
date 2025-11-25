@@ -54,7 +54,9 @@
       "mcp__chrome-devtools__close_page",
       "Bash(powershell -Command \"Get-ChildItem -Recurse | Measure-Object -Property Length -Sum | Select-Object @{Name=''Size(MB)'';Expression={[math]::Round($_Sum / 1MB, 2)}}, Count\")",
       "mcp__chrome-devtools__evaluate_script",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(ssh:*)",
+      "mcp__smithery-ai-server-sequential-thinking__sequentialthinking"
     ],
     "deny": [],
     "ask": []
